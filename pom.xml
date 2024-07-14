@@ -8,11 +8,22 @@
 		<version>3.3.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.shdv09</groupId>
 	<artifactId>pro-fit</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>pro-fit</name>
 	<description>Fitness club management system</description>
+
+	<packaging>pom</packaging>
+	
+	<modules>
+        <module>web-application</module>
+		<module>visit-service</module>
+		<module>appointment-service</module>
+		<module>report-service</module>
+	</modules>
+	
 	<url/>
 	<licenses>
 		<license/>
@@ -28,6 +39,8 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
 	</properties>
 	<dependencies>
 		<dependency>
