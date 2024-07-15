@@ -1,13 +1,13 @@
-package com.shdv09.appointmentservice;
+package com.shdv09.reportservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AppointmentService {
+public class ReportServiceApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AppointmentService.class, args);
+		SpringApplication.run(ReportServiceApp.class, args);
 	}
 
 }

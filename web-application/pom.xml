@@ -27,16 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<main-class>com.shdv09.webapplication.WebApplication</main-class>
+		<main-class>com.shdv09.webapplication.WebApplicationApp</main-class>
 	</properties>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

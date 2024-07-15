@@ -9,10 +9,10 @@
 		<version>1.0</version>
 	</parent>
 
-	<artifactId>report-service</artifactId>
+	<artifactId>client-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>report-service</name>
-	<description>report-service</description>
+	<name>client-service</name>
+	<description>client-service</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<main-class>com.shdv09.reportservice.ReportServiceApp</main-class>
+		<main-class>com.shdv09.clientservice.ClientServiceApp</main-class>
 	</properties>
 
 </project>
