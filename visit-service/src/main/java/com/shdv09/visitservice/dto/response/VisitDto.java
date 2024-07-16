@@ -1,5 +1,6 @@
 package com.shdv09.visitservice.dto.response;
 
+import com.shdv09.visitservice.dto.response.clientservice.ClientDto;
 import lombok.Data;
 
 import java.util.Date;

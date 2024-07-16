@@ -3,6 +3,6 @@ package com.shdv09.visitservice.dto.request;
 import lombok.Data;
 
 @Data
-public class CreateVisitDto {
+public class ProcessVisitDto {
     private String cardNumber;
 }

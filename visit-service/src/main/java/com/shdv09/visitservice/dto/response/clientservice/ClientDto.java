@@ -1,4 +1,4 @@
-package com.shdv09.visitservice.dto.response;
+package com.shdv09.visitservice.dto.response.clientservice;
 
 import lombok.Data;
 
@@ -11,4 +11,5 @@ public class ClientDto {
     private String lastName;
     private String gender;
     private Date birthDate;
+    private ClubCardDto card;
 }
