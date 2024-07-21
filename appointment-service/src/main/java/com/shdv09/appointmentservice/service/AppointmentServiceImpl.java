@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
-import static com.shdv09.appointmentservice.model.TimeSlot.*;
+import static com.shdv09.appointmentservice.model.TimeSlot.TimeSlotPK;
 
 @RequiredArgsConstructor
 @Service

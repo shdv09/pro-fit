@@ -8,9 +8,14 @@ import java.time.LocalDate;
 @Data
 public class TrainerDto {
     private Long id;
+
     private String firstName;
+
     private String lastName;
+
     private String gender;
+
     private LocalDate birthDate;
+
     private Specialization specialization;
 }

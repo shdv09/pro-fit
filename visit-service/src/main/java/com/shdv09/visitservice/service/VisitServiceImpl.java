@@ -47,7 +47,8 @@ public class VisitServiceImpl implements VisitService {
         LocalTime start = cardType.getStart();
         LocalTime end = cardType.getEnd();
         if (now.isBefore(start) || now.isAfter(end)) {
-            throw new AccessDeniedException("Access to club denied for card %s, invalid hours".formatted(card.getNumber()));
+            throw new AccessDeniedException("Access to club denied for card %s, invalid hours"
+                    .formatted(card.getNumber()));
         }
 
     }

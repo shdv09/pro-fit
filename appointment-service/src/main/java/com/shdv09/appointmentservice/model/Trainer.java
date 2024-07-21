@@ -20,10 +20,15 @@ public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String firstName;
+
     private String lastName;
+
     private String gender;
+
     private LocalDate birthDate;
+
     @Enumerated(value = EnumType.STRING)
     private Specialization specialization;
 }

@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class AppointmentDto {
     private TrainerDto trainer;
+
     private TimeslotDto timeslot;
 }

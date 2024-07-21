@@ -11,5 +11,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TimeslotDto {
     private LocalDate workoutDate;
+
     private Integer workoutHour;
 }

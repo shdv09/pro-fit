@@ -9,8 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -29,10 +27,12 @@ import java.time.LocalDate;
 public class TimeSlot {
     @EmbeddedId
     private TimeSlotPK pKey;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainer_id", nullable = false)
     @MapsId("trainerId")
     private Trainer trainer;
+
     @Column(nullable = false)
     private Long clientId;
 
@@ -41,9 +41,12 @@ public class TimeSlot {
     @AllArgsConstructor
     @Data
     public static class TimeSlotPK implements Serializable {
+        @Column(nullable = false)
         private Long trainerId;
+
         @Column(nullable = false)
         private LocalDate workoutDate;
+
         @Column(nullable = false)
         private Integer workoutHour;
     }

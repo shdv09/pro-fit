@@ -9,6 +9,7 @@ public enum CardType {
     ALL_DAY("08:00:00", "22:00:00");
 
     private final LocalTime start;
+
     private final LocalTime end;
 
     CardType(String start, String end) {

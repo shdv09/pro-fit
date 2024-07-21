@@ -9,10 +9,13 @@ import java.time.LocalDate;
 public class CreateAppointmentDto {
     @NotNull
     private Long trainerId;
+
     @NotNull
     private Long clientId;
+
     @NotNull
     private LocalDate date;
+
     @NotNull
     private Integer hour;
 }
