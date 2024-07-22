@@ -3,6 +3,7 @@ package com.shdv09.appointmentservice.exception;
 import com.shdv09.appointmentservice.dto.response.ErrorDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,6 +30,13 @@ public class ControllerExceptionHandler {
     ErrorDto requestValidationException(RequestValidationException e) {
         log.error("Request validation error: {}", e.getMessage());
         return new ErrorDto(e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ErrorDto requestValidationException(MethodArgumentNotValidException e) {
+        log.error("Request validation error: {}", e.getBindingResult().getTarget());
+        return new ErrorDto("Validation failed for: %s".formatted(e.getBindingResult().getTarget()));
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,11 +1,16 @@
 package com.shdv09.visitservice.exception;
 
 import com.shdv09.visitservice.dto.response.ErrorDto;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Objects;
 
 @Slf4j
 @RestControllerAdvice
@@ -14,6 +19,20 @@ public class ControllerExceptionHandler {
     ResponseEntity<ErrorDto> accessDeniedException(AccessDeniedException e) {
         log.error("Access to club denied: {}", e.getMessage());
         return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(FeignException.class)
+    ResponseEntity<ErrorDto> feignException(FeignException e) {
+        log.error("Feign client exception: {}", e.getMessage());
+        return new ResponseEntity<>(
+                new ErrorDto(e.getMessage()), Objects.requireNonNull(HttpStatus.resolve(e.status())));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ErrorDto requestValidationException(MethodArgumentNotValidException e) {
+        log.error("Request validation error: {}", e.getBindingResult().getTarget());
+        return new ErrorDto("Validation failed for: %s".formatted(e.getBindingResult().getTarget()));
     }
 
     @ExceptionHandler(Exception.class)

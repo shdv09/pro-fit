@@ -32,7 +32,7 @@ public class ClientServiceImpl implements ClientService {
                 .orElseThrow(() -> new NotFoundException("Client with id = %d not found".formatted(id)));
         ClubCardDto clubCardDto = clubCardRepository.findClubCardByClientId(id)
                 .map(clubCardMapper::toDto)
-                .orElseThrow(() -> new NotFoundException("Club card for Client with id = %d not found".formatted(id)));
+                .orElse(null);
         result.setCard(clubCardDto);
         return result;
     }

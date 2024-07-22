@@ -1,0 +1,13 @@
+{
+  "id": 2,
+  "number": "55555",
+  "cardType": "MORNING",
+  "isActive": false,
+  "client": {
+    "id": 2,
+    "firstName": "Petr",
+    "lastName": "Petrov",
+    "gender": "M",
+    "birthDate": "2001-11-26T21:00:00.000+00:00"
+  }
+}
