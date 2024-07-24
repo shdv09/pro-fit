@@ -1,13 +1,11 @@
-package com.shdv09.clientservice.dto.response;
+package com.shdv09.clientservice.dto.request;
 
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class ClientDto {
-    private Long id;
-
+public class AddClientDto {
     private String firstName;
 
     private String lastName;
@@ -15,6 +13,4 @@ public class ClientDto {
     private String gender;
 
     private LocalDate birthDate;
-
-    private ClubCardDto card;
 }

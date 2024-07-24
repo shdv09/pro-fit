@@ -1,11 +1,12 @@
-package com.shdv09.clientservice.dto.response;
+package com.shdv09.webapplication.dto.response;
 
+import com.shdv09.webapplication.model.Specialization;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class ClientDto {
+public class TrainerDto {
     private Long id;
 
     private String firstName;
@@ -16,5 +17,5 @@ public class ClientDto {
 
     private LocalDate birthDate;
 
-    private ClubCardDto card;
+    private Specialization specialization;
 }

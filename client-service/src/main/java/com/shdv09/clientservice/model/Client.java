@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "clients")
@@ -25,5 +25,5 @@ public class Client {
 
     private String gender;
 
-    private Date birthDate;
+    private LocalDate birthDate;
 }

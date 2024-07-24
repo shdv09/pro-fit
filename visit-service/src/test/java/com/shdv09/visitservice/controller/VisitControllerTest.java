@@ -99,7 +99,7 @@ class VisitControllerTest {
         when(visitRepository.save(any(Visit.class))).thenReturn(savedVisit);
         ProcessVisitDto request = new ProcessVisitDto(CARD_NUMBER);
 
-        MvcResult result = mockMvc.perform(post("/api/visit")
+        MvcResult result = mockMvc.perform(post("/api/visits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -134,7 +134,7 @@ class VisitControllerTest {
         when(visitRepository.save(any(Visit.class))).thenReturn(updatedVisit);
         ProcessVisitDto request = new ProcessVisitDto(CARD_NUMBER);
 
-        MvcResult result = mockMvc.perform(post("/api/visit")
+        MvcResult result = mockMvc.perform(post("/api/visits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -166,7 +166,7 @@ class VisitControllerTest {
         when(clientServiceProxy.findClientByCardNumber(anyString())).thenThrow(ex);
         ProcessVisitDto request = new ProcessVisitDto(CARD_NUMBER);
 
-        mockMvc.perform(post("/api/visit")
+        mockMvc.perform(post("/api/visits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
@@ -185,7 +185,7 @@ class VisitControllerTest {
         when(clientServiceProxy.findClientByCardNumber(anyString())).thenReturn(client);
         ProcessVisitDto request = new ProcessVisitDto(CARD_NUMBER);
 
-        mockMvc.perform(post("/api/visit")
+        mockMvc.perform(post("/api/visits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden())
@@ -202,7 +202,7 @@ class VisitControllerTest {
     void processVisitBadRequestErrorTest() throws Exception {
         ProcessVisitDto request = new ProcessVisitDto();
 
-        mockMvc.perform(post("/api/visit")
+        mockMvc.perform(post("/api/visits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())

@@ -37,6 +37,14 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Transactional(readOnly = true)
     @Override
+    public TrainerDto findTrainer(Long id) {
+        return trainerRepository.findById(id)
+                .map(trainerMapper::toDto)
+                .orElseThrow(() -> new NotFoundException("Trainer with id=%d not found".formatted(id)));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public List<TimeslotDto> getBusyTimeslots(Long trainerId, LocalDate appointmentDate) {
         if (!trainerRepository.existsById(trainerId)) {
             throw new NotFoundException("Trainer with id=%d not found".formatted(trainerId));

@@ -1,10 +1,10 @@
-package com.shdv09.clientservice.controller;
+package com.shdv09.webapplication.controller;
 
-import com.shdv09.clientservice.dto.request.AddClientDto;
-import com.shdv09.clientservice.dto.request.BindCardRequest;
-import com.shdv09.clientservice.dto.request.UpdateClientDto;
-import com.shdv09.clientservice.dto.response.ClientDto;
-import com.shdv09.clientservice.service.ClientService;
+import com.shdv09.webapplication.dto.request.AddClientDto;
+import com.shdv09.webapplication.dto.request.BindCardRequest;
+import com.shdv09.webapplication.dto.request.UpdateClientDto;
+import com.shdv09.webapplication.dto.response.ClientDto;
+import com.shdv09.webapplication.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,25 +23,18 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ClientController {
-
     private final ClientService clientService;
 
     @GetMapping("/clients")
     public List<ClientDto> findClients(@RequestParam(name = "firstName", required = false) String firstName,
                                        @RequestParam(name = "lastName", required = false) String lastName,
-                                       @RequestParam(name = "birthDate", required = false) LocalDate birthDate) {
+                                       @RequestParam(name = "birtDate", required = false) LocalDate birthDate) {
         return clientService.findClients(firstName, lastName, birthDate);
-
     }
 
     @GetMapping("/clients/{id}")
-    public ClientDto findClient(@PathVariable(name = "id") long id) {
+    public ClientDto findClient(@PathVariable(name = "id") Long id) {
         return clientService.findClient(id);
-    }
-
-    @GetMapping("/clients/cards/{number}")
-    public ClientDto findClientByCard(@PathVariable(name = "number") String number) {
-        return clientService.findClientByCardNumber(number);
     }
 
     @PostMapping("/clients")
@@ -55,7 +48,7 @@ public class ClientController {
     }
 
     @PutMapping("clients/cards")
-    public ClientDto bindCardToClient(@RequestBody @Valid BindCardRequest request) {
+    public ClientDto bindCardToClient(BindCardRequest request) {
         return clientService.bindCard(request);
     }
 }

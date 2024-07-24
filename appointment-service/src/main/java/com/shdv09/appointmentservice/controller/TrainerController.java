@@ -4,7 +4,6 @@ import com.shdv09.appointmentservice.dto.response.TimeslotDto;
 import com.shdv09.appointmentservice.dto.response.TrainerDto;
 import com.shdv09.appointmentservice.service.TrainerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,9 +25,14 @@ public class TrainerController {
         return trainerService.findAll();
     }
 
+    @GetMapping("/trainers/{id}")
+    public TrainerDto findTrainer(@PathVariable(name = "id") Long id) {
+        return trainerService.findTrainer(id);
+    }
+
     @GetMapping("/trainers/{id}/timeslots")
     public List<TimeslotDto> getBusyTimeslots(@PathVariable(name = "id") Long trainerId,
-            @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appointmentDate) {
+            @RequestParam(name = "date") LocalDate appointmentDate) {
         return trainerService.getBusyTimeslots(trainerId, appointmentDate);
     }
 }

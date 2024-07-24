@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "client-service", url = "localhost:8001")
 public interface ClientServiceProxy {
 
-    @GetMapping("/api/client/card/{number}")
+    @GetMapping("/api/clients/cards/{number}")
     ClientDto findClientByCardNumber(@PathVariable(name = "number") String cardNumber);
 }

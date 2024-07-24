@@ -10,4 +10,6 @@ public interface TrainerService {
     List<TrainerDto> findAll();
 
     List<TimeslotDto> getBusyTimeslots(Long trainerId, LocalDate appointmentDate);
+
+    TrainerDto findTrainer(Long id);
 }
