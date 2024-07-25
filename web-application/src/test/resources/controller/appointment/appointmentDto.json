@@ -1,0 +1,14 @@
+{
+  "trainer": {
+    "id": 1,
+    "firstName": "Chuck",
+    "lastName": "Norris",
+    "gender": "M",
+    "birthDate": "1940-03-10",
+    "specialization": "COMBAT"
+  },
+  "timeslot": {
+    "workoutDate": "2024-07-26",
+    "workoutHour": 18
+  }
+}

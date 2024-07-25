@@ -28,7 +28,7 @@ public class ClientController {
     @GetMapping("/clients")
     public List<ClientDto> findClients(@RequestParam(name = "firstName", required = false) String firstName,
                                        @RequestParam(name = "lastName", required = false) String lastName,
-                                       @RequestParam(name = "birtDate", required = false) LocalDate birthDate) {
+                                       @RequestParam(name = "birthDate", required = false) LocalDate birthDate) {
         return clientService.findClients(firstName, lastName, birthDate);
     }
 
@@ -48,7 +48,7 @@ public class ClientController {
     }
 
     @PutMapping("clients/cards")
-    public ClientDto bindCardToClient(BindCardRequest request) {
+    public ClientDto bindCardToClient(@RequestBody @Valid BindCardRequest request) {
         return clientService.bindCard(request);
     }
 }

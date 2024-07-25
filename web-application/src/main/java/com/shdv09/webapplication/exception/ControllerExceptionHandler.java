@@ -1,6 +1,6 @@
-package com.shdv09.visitservice.exception;
+package com.shdv09.webapplication.exception;
 
-import com.shdv09.visitservice.dto.response.ErrorDto;
+import com.shdv09.webapplication.dto.response.ErrorDto;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,18 +10,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @RestControllerAdvice
 public class ControllerExceptionHandler {
-    @ExceptionHandler(AccessDeniedException.class)
-    ResponseEntity<ErrorDto> accessDeniedException(AccessDeniedException e) {
-        log.error("Access to club denied: {}", e.getMessage());
-        return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.FORBIDDEN);
-    }
-
     @ExceptionHandler(FeignException.class)
     ResponseEntity<ErrorDto> feignException(FeignException e) {
         log.error("Feign client exception: {}", e.getMessage());
