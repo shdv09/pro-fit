@@ -1,0 +1,28 @@
+server:
+  port: 8004
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:h2:mem:userdb
+  h2:
+    console.enabled: true
+    console:
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: true
+jwt:
+  ttl: 3600
+  private:
+    key: classpath:app.key
+  public:
+    key: classpath:app.pub

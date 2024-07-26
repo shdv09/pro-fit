@@ -23,6 +23,7 @@
         <module>appointment-service</module>
         <module>report-service</module>
         <module>client-service</module>
+		<module>auth-service</module>
     </modules>
 
     <url/>
