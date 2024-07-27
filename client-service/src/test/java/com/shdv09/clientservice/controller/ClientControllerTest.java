@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -46,7 +47,6 @@ class ClientControllerTest {
     private static final String CLIENT_DTO_REFERENCE_JSON_PATH = "/controller/client/clientDtoReference.json";
     private static final String CLIENT_DTO_NULL_CARD_REFERENCE_JSON_PATH = "/controller/client/clientDtoNullCardReference.json";
 
-
     @Autowired
     private ObjectMapper mapper;
 
@@ -70,6 +70,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findClientPositiveTest() throws Exception {
         Client client = mapper.readValue(getFileContent(CLIENT_JSON_PATH), Client.class);
         when(clientRepository.findById(any())).thenReturn(Optional.of(client));
@@ -92,6 +93,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void clientNotFoundTest() throws Exception {
         when(clientRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -106,6 +108,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findClientCardNotFoundTest() throws Exception {
         Client client = mapper.readValue(getFileContent(CLIENT_JSON_PATH), Client.class);
         when(clientRepository.findById(any())).thenReturn(Optional.of(client));
@@ -127,6 +130,14 @@ class ClientControllerTest {
     }
 
     @Test
+    void findClientUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/clients/2"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "user")
     void findClientByCardPositiveTest() throws Exception {
         ClubCard clubCard = mapper.readValue(getFileContent(CLUB_CARD_JSON_PATH), ClubCard.class);
         when(clubCardRepository.findClubCardByNumber(anyString())).thenReturn(Optional.of(clubCard));
@@ -146,6 +157,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findClientByCardNotFoundTest() throws Exception {
         when(clubCardRepository.findClubCardByNumber(anyString())).thenReturn(Optional.empty());
 
@@ -157,6 +169,13 @@ class ClientControllerTest {
         assertAll(
                 () -> verify(clubCardRepository).findClubCardByNumber(CLUB_CARD_NUMBER)
         );
+    }
+
+    @Test
+    void findClientByCardUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/clients/cards/55555"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
     }
 
     private String getFileContent(String path) throws Exception {

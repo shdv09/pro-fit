@@ -22,7 +22,5 @@ spring:
     show-sql: true
 jwt:
   ttl: 3600
-  private:
-    key: classpath:app.key
-  public:
-    key: classpath:app.pub
+  private-key: classpath:private.key
+  public-key: classpath:public.key

@@ -20,3 +20,6 @@ spring:
       hibernate:
         format_sql: false
     show-sql: true
+jwt:
+  private-key: classpath:private.key
+  public-key: classpath:public.key

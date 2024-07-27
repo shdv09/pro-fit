@@ -22,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -89,6 +90,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processNewVisitTest() throws Exception {
         doNothing().when(cardValidator).validateCard(any(ClubCardDto.class));
         when(dateFactory.generateDate()).thenReturn(new Date(1721649600000L));
@@ -123,6 +125,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processExistedVisitTest() throws Exception {
         doNothing().when(cardValidator).validateCard(any(ClubCardDto.class));
         when(dateFactory.generateDate()).thenReturn(new Date(1721721600000L));
@@ -157,6 +160,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processVisitCardNotFoundTest() throws Exception {
         doNothing().when(cardValidator).validateCard(any(ClubCardDto.class));
         when(dateFactory.generateDate()).thenReturn(new Date(1721649600000L));
@@ -178,6 +182,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processVisitCardValidationErrorTest() throws Exception {
         doThrow(new AccessDeniedException("Access to club denied for card 55555, invalid hours"))
                 .when(cardValidator).validateCard(any(ClubCardDto.class));
@@ -199,6 +204,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processVisitBadRequestErrorTest() throws Exception {
         ProcessVisitDto request = new ProcessVisitDto();
 
@@ -207,6 +213,17 @@ class VisitControllerTest {
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json("{\"error\":\"Validation failed for: ProcessVisitDto(cardNumber=null)\"}"))
+                .andDo(print());
+    }
+
+    @Test
+    void processVisitUnauthorizedTest() throws Exception {
+        ProcessVisitDto request = new ProcessVisitDto(CARD_NUMBER);
+
+        mockMvc.perform(post("/api/visits")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
 

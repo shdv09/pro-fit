@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -81,6 +82,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentPositiveTest() throws Exception {
         doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
@@ -112,6 +114,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentTrainerMissingTest() throws Exception {
         doNothing().when(createAppointmentValidator).validateRequest(any());
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -131,6 +134,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentTimeSlotBusyTest() throws Exception {
         doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
@@ -155,6 +159,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentDataIntegrityErrorTest() throws Exception {
         doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
@@ -182,6 +187,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentValidationTest() throws Exception {
         CreateAppointmentDto request = new CreateAppointmentDto();
 
@@ -194,6 +200,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentValidatorTest() throws Exception {
         doThrow(new RequestValidationException("Invalid date, you can't create appointment in the past"))
                 .when(createAppointmentValidator).validateRequest(any());
@@ -210,6 +217,17 @@ class AppointmentControllerTest {
         assertAll(
                 () -> verify(createAppointmentValidator).validateRequest(request)
         );
+    }
+
+    @Test
+    void createAppointmentUnauthorizedTest() throws Exception {
+        CreateAppointmentDto request = new CreateAppointmentDto(TRAINER_ID, CLIENT_ID, WORKOUT_DATE, 10);
+
+        mockMvc.perform(post("/api/appointment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
     }
 
     private String getFileContent(String path) throws Exception {

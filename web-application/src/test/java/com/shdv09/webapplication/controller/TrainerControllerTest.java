@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -67,6 +68,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void getAllTrainersPositiveTest() throws Exception {
         List<TrainerDto> trainers = mapper.readValue(getFileContent(TRAINER_DTO_LIST_JSON_PATH), new TypeReference<>() {
         });
@@ -86,6 +88,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void getAllTrainersErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.getMessage()).thenReturn("Server error");
@@ -102,6 +105,14 @@ class TrainerControllerTest {
     }
 
     @Test
+    void getAllTrainersUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/trainers"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "user")
     void findTrainerPositiveTest() throws Exception {
         TrainerDto trainer = mapper.readValue(getFileContent(TRAINER_DTO_JSON_PATH), TrainerDto.class);
         when(appointmentServiceProxy.findTrainer(anyLong())).thenReturn(trainer);
@@ -119,6 +130,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findTrainerErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.status()).thenReturn(404);
@@ -137,6 +149,15 @@ class TrainerControllerTest {
     }
 
     @Test
+    void findTrainerUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/trainers/1"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "user")
     void getTrainersSchedulePositiveTest() throws Exception {
         List<TimeslotDto> timeslots = mapper.readValue(getFileContent(TIMESLOTS_DTO_JSON_PATH), new TypeReference<>() {
         });
@@ -158,6 +179,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void getTrainersScheduleErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.status()).thenReturn(404);
@@ -174,6 +196,15 @@ class TrainerControllerTest {
         assertAll(
                 () -> verify(appointmentServiceProxy).getBusyTimeslots(TRAINER_ID, LocalDate.parse(WORKOUT_DATE))
         );
+    }
+
+    @Test
+    void getTrainersScheduleUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/trainers/1/schedule")
+                        .param("id", TRAINER_ID.toString())
+                        .param("date", WORKOUT_DATE))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
     }
 
     private String getFileContent(String path) throws Exception {

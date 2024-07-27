@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -60,6 +61,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentPositiveTest() throws Exception {
         AppointmentDto appointment = mapper.readValue(getFileContent(APPOINTMENT_DTO_JSON_PATH), AppointmentDto.class);
         when(appointmentServiceProxy.createAppointment(any(CreateAppointmentDto.class))).thenReturn(appointment);
@@ -80,6 +82,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.status()).thenReturn(404);
@@ -100,6 +103,7 @@ class AppointmentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void createAppointmentValidationErrorTest() throws Exception {
         CreateAppointmentDto request = new CreateAppointmentDto();
 
@@ -108,6 +112,17 @@ class AppointmentControllerTest {
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json("{\"error\":\"Validation failed for: CreateAppointmentDto(trainerId=null, clientId=null, date=null, hour=null)\"}"))
+                .andDo(print());
+    }
+
+    @Test
+    void createAppointmentUnauthorizedTest() throws Exception {
+        CreateAppointmentDto request = mapper.readValue(getFileContent(CREATE_APPOINTMENT_DTO_JSON_PATH), CreateAppointmentDto.class);
+
+        mockMvc.perform(post("/api/appointment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
 

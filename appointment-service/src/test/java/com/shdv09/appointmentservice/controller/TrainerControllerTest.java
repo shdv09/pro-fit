@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -70,6 +71,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void getAllTrainersPositiveTest() throws Exception {
         List<Trainer> trainers = mapper.readValue(getFileContent(TRAINERS_LIST_JSON_PATH), new TypeReference<>() {});
         when(trainerRepository.findAll()).thenReturn(trainers);
@@ -89,6 +91,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void getAllTrainersErrorTest() throws Exception {
         when(trainerRepository.findAll()).thenThrow(new RuntimeException());
 
@@ -102,6 +105,14 @@ class TrainerControllerTest {
     }
 
     @Test
+    void getAllTrainersUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/trainers"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "user")
     void getBusyTimeslotsPositiveTest() throws Exception {
         List<TimeSlot> timeSlots = mapper.readValue(getFileContent(TIMESLOTS_JSON_PATH), new TypeReference<>() {});
         when(timeSlotRepository.findBypKeyWorkoutDateAndTrainerId(any(LocalDate.class), anyLong())).thenReturn(timeSlots);
@@ -124,6 +135,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void getBusyTimeslotsTrainerNotFoundTest() throws Exception {
         when(trainerRepository.existsById(anyLong())).thenReturn(Boolean.FALSE);
 
@@ -140,6 +152,7 @@ class TrainerControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void getBusyTimeslotsErrorTest() throws Exception {
         when(trainerRepository.existsById(anyLong())).thenReturn(Boolean.TRUE);
         when(timeSlotRepository.findBypKeyWorkoutDateAndTrainerId(any(LocalDate.class), anyLong())).thenThrow(new RuntimeException());
@@ -153,6 +166,14 @@ class TrainerControllerTest {
                 () -> verify(trainerRepository).existsById(TRAINER_ID),
                 () -> verify(timeSlotRepository).findBypKeyWorkoutDateAndTrainerId(WORKOUT_DATE, TRAINER_ID)
         );
+    }
+
+    @Test
+    void getBusyTimeslotsUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/trainers/1/timeslots")
+                        .param("date", "2024-07-21"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
     }
 
     private String getFileContent(String path) throws Exception {

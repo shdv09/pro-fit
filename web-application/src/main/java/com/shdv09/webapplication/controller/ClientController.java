@@ -7,6 +7,7 @@ import com.shdv09.webapplication.dto.response.ClientDto;
 import com.shdv09.webapplication.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,16 +39,19 @@ public class ClientController {
     }
 
     @PostMapping("/clients")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     public ClientDto addClient(@RequestBody @Valid AddClientDto clientDto) {
         return clientService.addClient(clientDto);
     }
 
     @PutMapping("/clients")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     public ClientDto updateClient(@RequestBody @Valid UpdateClientDto clientDto) {
         return clientService.updateClient(clientDto);
     }
 
     @PutMapping("clients/cards")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     public ClientDto bindCardToClient(@RequestBody @Valid BindCardRequest request) {
         return clientService.bindCard(request);
     }

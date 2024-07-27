@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -75,6 +76,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findClientPositiveTest() throws Exception {
         ClientDto client = mapper.readValue(getFileContent(CLIENT_DTO_JSON_PATH), ClientDto.class);
         when(clientServiceProxy.findClient(anyLong())).thenReturn(client);
@@ -92,6 +94,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findClientErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.status()).thenReturn(404);
@@ -109,6 +112,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findClientsPositiveTest() throws Exception {
         List<ClientDto> clients = mapper.readValue(getFileContent(CLIENT_DTO_LIST_JSON_PATH), new TypeReference<>() {});
         when(clientServiceProxy.findClients(anyString(), anyString(), any(LocalDate.class))).thenReturn(clients);
@@ -129,6 +133,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void findClientsErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.getMessage()).thenReturn("Server error");
@@ -148,6 +153,17 @@ class ClientControllerTest {
     }
 
     @Test
+    void findClientsUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/api/clients")
+                        .param("firstName", FIRST_NAME)
+                        .param("lastName", LAST_NAME)
+                        .param("birthDate", DATE_OF_BIRTH))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void addClientPositiveTest() throws Exception {
         ClientDto client = mapper.readValue(getFileContent(CLIENT_DTO_JSON_PATH), ClientDto.class);
         when(clientServiceProxy.addClient(any(AddClientDto.class))).thenReturn(client);
@@ -168,6 +184,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void addClientErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.getMessage()).thenReturn("Server error");
@@ -187,6 +204,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", authorities = {"SCOPE_ROLE_ADMIN"})
     void addClientValidationErrorTest() throws Exception {
         AddClientDto request = new AddClientDto();
 
@@ -199,6 +217,31 @@ class ClientControllerTest {
     }
 
     @Test
+    void addClientUnauthorizedTest() throws Exception {
+        AddClientDto request = mapper.readValue(getFileContent(ADD_CLIENT_DTO_JSON_PATH), AddClientDto.class);
+
+        mockMvc.perform(post("/api/clients")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    void addClientForbiddenTest() throws Exception {
+        AddClientDto request = mapper.readValue(getFileContent(ADD_CLIENT_DTO_JSON_PATH), AddClientDto.class);
+
+        mockMvc.perform(post("/api/clients")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden())
+                .andExpect(content().json("{\"error\":\"Access Denied\"}"))
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void updateClientPositiveTest() throws Exception {
         ClientDto client = mapper.readValue(getFileContent(CLIENT_DTO_JSON_PATH), ClientDto.class);
         when(clientServiceProxy.updateClient(any(UpdateClientDto.class))).thenReturn(client);
@@ -219,6 +262,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void updateClientErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.getMessage()).thenReturn("Server error");
@@ -238,6 +282,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void updateClientValidationErrorTest() throws Exception {
         UpdateClientDto request = new UpdateClientDto();
 
@@ -250,6 +295,31 @@ class ClientControllerTest {
     }
 
     @Test
+    void updateClientUnauthorizedTest() throws Exception {
+        UpdateClientDto request = mapper.readValue(getFileContent(UPDATE_CLIENT_DTO_JSON_PATH), UpdateClientDto.class);
+
+        mockMvc.perform(put("/api/clients")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    void updateClientForbiddenTest() throws Exception {
+        UpdateClientDto request = mapper.readValue(getFileContent(UPDATE_CLIENT_DTO_JSON_PATH), UpdateClientDto.class);
+
+        mockMvc.perform(put("/api/clients")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden())
+                .andExpect(content().json("{\"error\":\"Access Denied\"}"))
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void bindCardWithClientPositiveTest() throws Exception {
         ClientDto client = mapper.readValue(getFileContent(CLIENT_DTO_JSON_PATH), ClientDto.class);
         when(clientServiceProxy.bindCardToClient(any(BindCardRequest.class))).thenReturn(client);
@@ -270,6 +340,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void bindCardWithClientErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.status()).thenReturn(404);
@@ -282,8 +353,7 @@ class ClientControllerTest {
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().json("{\"error\":\"Client not found\"}"))
-                .andDo(print())
-                .andReturn();
+                .andDo(print());
 
         assertAll(
                 () -> verify(clientServiceProxy).bindCardToClient(request)
@@ -291,6 +361,7 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", authorities = {"SCOPE_ROLE_ADMIN"})
     void bindCardWithClientValidationErrorTest() throws Exception {
         BindCardRequest request = new BindCardRequest();
 
@@ -299,8 +370,31 @@ class ClientControllerTest {
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json("{\"error\":\"Validation failed for: BindCardRequest(clientId=null, cardId=null)\"}"))
-                .andDo(print())
-                .andReturn();
+                .andDo(print());
+    }
+
+    @Test
+    void bindCardWithClientUnauthorizedTest() throws Exception {
+        BindCardRequest request = mapper.readValue(getFileContent(BIND_CARD_REQUEST_JSON_PATH), BindCardRequest.class);
+
+        mockMvc.perform(put("/api/clients/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "admin")
+    void bindCardWithClientForbiddenTest() throws Exception {
+        BindCardRequest request = mapper.readValue(getFileContent(BIND_CARD_REQUEST_JSON_PATH), BindCardRequest.class);
+
+        mockMvc.perform(put("/api/clients/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden())
+                .andExpect(content().json("{\"error\":\"Access Denied\"}"))
+                .andDo(print());
     }
 
     private String getFileContent(String path) throws Exception {

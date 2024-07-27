@@ -3,3 +3,6 @@ server:
 spring:
   application:
     name: web-application
+jwt:
+  private-key: classpath:private.key
+  public-key: classpath:public.key

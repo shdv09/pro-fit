@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -60,6 +61,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processVisitPositiveTest() throws Exception {
         VisitDto visit = mapper.readValue(getFileContent(VISIT_DTO_JSON_PATH), VisitDto.class);
         when(visitServiceProxy.processVisit(any(ProcessVisitDto.class))).thenReturn(visit);
@@ -80,6 +82,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processVisitErrorTest() throws Exception {
         FeignException ex = mock(FeignException.class);
         when(ex.status()).thenReturn(404);
@@ -100,6 +103,7 @@ class VisitControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     void processVisitValidationErrorTest() throws Exception {
         ProcessVisitDto request = new ProcessVisitDto();
 
@@ -108,6 +112,17 @@ class VisitControllerTest {
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json("{\"error\":\"Validation failed for: ProcessVisitDto(cardNumber=null)\"}"))
+                .andDo(print());
+    }
+
+    @Test
+    void processVisitUnauthorizedTest() throws Exception {
+        ProcessVisitDto request = new ProcessVisitDto(CARD_NUMBER);
+
+        mockMvc.perform(post("/api/visits")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
 
