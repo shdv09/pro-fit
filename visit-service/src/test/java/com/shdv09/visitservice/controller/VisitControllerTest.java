@@ -212,7 +212,7 @@ class VisitControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"error\":\"Validation failed for: ProcessVisitDto(cardNumber=null)\"}"))
+                .andExpect(content().json("{\"error\":\"Validation failed for: cardNumber\"}"))
                 .andDo(print());
     }
 

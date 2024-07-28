@@ -194,7 +194,7 @@ class AppointmentControllerTest {
         mockMvc.perform(post("/api/appointment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
-                .andExpect(content().json("{\"error\":\"Validation failed for: CreateAppointmentDto(trainerId=null, clientId=null, date=null, hour=null)\"}"))
+                .andExpect(content().json("{\"error\":\"Validation failed for: clientId, date, hour, trainerId\"}"))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
