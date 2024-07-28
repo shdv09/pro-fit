@@ -111,7 +111,7 @@ class AppointmentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"error\":\"Validation failed for: CreateAppointmentDto(trainerId=null, clientId=null, date=null, hour=null)\"}"))
+                .andExpect(content().json("{\"error\":\"Validation failed for: clientId, date, hour, trainerId\"}"))
                 .andDo(print());
     }
 

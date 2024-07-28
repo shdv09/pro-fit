@@ -1,0 +1,27 @@
+package com.shdv09.webapplication.controller;
+
+import com.shdv09.webapplication.feign.AuthServiceProxy;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+@Tag(name = "Authorization Controller", description = "Контроллер авторизации пользователя")
+public class AuthController {
+    private final AuthServiceProxy authServiceProxy;
+
+    @GetMapping("/login")
+    @Operation(summary = "Метод авторизации пользователя", responses = {
+            @ApiResponse(description = "JWT токен для авторизации")
+    })
+    public String generateToken(@RequestHeader(name = "Authorization") String basicAuthToken) {
+        return authServiceProxy.generateJwtToken(basicAuthToken);
+    }
+}

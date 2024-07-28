@@ -212,7 +212,7 @@ class ClientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"error\":\"Validation failed for: AddClientDto(firstName=null, lastName=null, gender=null, birthDate=null)\"}"))
+                .andExpect(content().json("{\"error\":\"Validation failed for: birthDate, firstName, gender, lastName\"}"))
                 .andDo(print());
     }
 
@@ -290,7 +290,7 @@ class ClientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"error\":\"Validation failed for: UpdateClientDto(id=null, firstName=null, lastName=null, gender=null, birthDate=null)\"}"))
+                .andExpect(content().json("{\"error\":\"Validation failed for: birthDate, firstName, gender, id, lastName\"}"))
                 .andDo(print());
     }
 
@@ -369,7 +369,7 @@ class ClientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"error\":\"Validation failed for: BindCardRequest(clientId=null, cardId=null)\"}"))
+                .andExpect(content().json("{\"error\":\"Validation failed for: cardId, clientId\"}"))
                 .andDo(print());
     }
 

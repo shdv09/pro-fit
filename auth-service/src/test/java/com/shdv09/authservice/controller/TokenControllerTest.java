@@ -1,9 +1,6 @@
 package com.shdv09.authservice.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -37,18 +34,10 @@ class TokenControllerTest {
     private static final String TOKEN = "token";
 
     @Autowired
-    private ObjectMapper mapper;
-
-    @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private JwtEncoder encoder;
-
-    @BeforeEach
-    void init() {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-    }
 
     @AfterEach
     void after() {

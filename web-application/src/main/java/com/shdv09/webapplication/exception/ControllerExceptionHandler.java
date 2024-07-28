@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -34,8 +36,13 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     ErrorDto requestValidationException(MethodArgumentNotValidException e) {
-        log.error("Request validation error: {}", e.getBindingResult().getTarget());
-        return new ErrorDto("Validation failed for: %s".formatted(e.getBindingResult().getTarget()));
+        List<String> errorFields = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getField)
+                .sorted()
+                .toList();
+        String errorFieldList = String.join(", ", errorFields);
+        log.error("Request validation error: {}", errorFieldList);
+        return new ErrorDto("Validation failed for: %s".formatted(errorFieldList));
     }
 
     @ExceptionHandler(Exception.class)
