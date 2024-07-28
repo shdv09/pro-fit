@@ -45,6 +45,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <lombokVersion>1.18.32</lombokVersion>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <spring-doc-version>2.0.2</spring-doc-version>
         <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
         <checkstyle.version>10.11.0</checkstyle.version>
         <checkstyle.config.url>
@@ -109,6 +110,11 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${spring-doc-version}</version>
         </dependency>
     </dependencies>
 
