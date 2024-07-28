@@ -1,7 +1,10 @@
 package com.shdv09.visitservice.dto.response.clientservice;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalTime;
 
+@Schema(description = "Тип клубной карты")
 public enum CardType {
     MORNING("08:00:00", "12:00:00"),
     AFTERNOON("12:00:00", "17:00:00"),

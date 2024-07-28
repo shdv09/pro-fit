@@ -1,4 +1,4 @@
-package com.shdv09.webapplication.config;
+package com.shdv09.appointmentservice.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -22,9 +22,5 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
         bearerFormat = "JWT",
         scheme = "bearer"
 )
-@SecurityScheme(
-        name = "basic",
-        type = SecuritySchemeType.HTTP,
-        scheme = "basic")
 public class OpenApiConfig {
 }

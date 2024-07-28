@@ -41,7 +41,7 @@ public class TrainerController {
     @GetMapping("/trainers/{id}/schedule")
     @Operation(summary = "Метод получения расписания тренера на определённую дату")
     public TrainerScheduleDto getTrainerSchedule(
-            @PathVariable(name = "id") Long trainerId,
+            @Parameter(description = "Идентификатор тренера") @PathVariable(name = "id") Long trainerId,
             @Parameter(description = "Дата расписания") @RequestParam(name = "date") LocalDate date) {
         return trainerService.getTrainerSchedule(trainerId, date);
     }

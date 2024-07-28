@@ -44,6 +44,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
+                        .requestMatchers(antMatcher("/v3/api-docs/**")).permitAll()
                         .anyRequest().authenticated())
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
