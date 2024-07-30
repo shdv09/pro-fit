@@ -14,12 +14,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.integration.jdbc.lock.JdbcLockRegistry;
+import org.springframework.integration.support.locks.LockRegistry;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,6 +33,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -71,6 +75,9 @@ class AppointmentControllerTest {
     @MockBean
     private CreateAppointmentValidator createAppointmentValidator;
 
+    @MockBean
+    private LockRegistry lockRegistry;
+
     @BeforeEach
     void init() {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
@@ -84,6 +91,9 @@ class AppointmentControllerTest {
     @Test
     @WithMockUser(username = "user")
     void createAppointmentPositiveTest() throws Exception {
+        Lock lock = Mockito.mock(Lock.class);
+        when(lock.tryLock()).thenReturn(Boolean.TRUE);
+        when(lockRegistry.obtain(any())).thenReturn(lock);
         doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
@@ -136,6 +146,9 @@ class AppointmentControllerTest {
     @Test
     @WithMockUser(username = "user")
     void createAppointmentTimeSlotBusyTest() throws Exception {
+        Lock lock = Mockito.mock(Lock.class);
+        when(lock.tryLock()).thenReturn(Boolean.TRUE);
+        when(lockRegistry.obtain(any())).thenReturn(lock);
         doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
@@ -161,6 +174,9 @@ class AppointmentControllerTest {
     @Test
     @WithMockUser(username = "user")
     void createAppointmentDataIntegrityErrorTest() throws Exception {
+        Lock lock = Mockito.mock(Lock.class);
+        when(lock.tryLock()).thenReturn(Boolean.TRUE);
+        when(lockRegistry.obtain(any())).thenReturn(lock);
         doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
@@ -183,6 +199,30 @@ class AppointmentControllerTest {
                 () -> verify(timeSlotRepository).findById(new TimeSlot.TimeSlotPK(TRAINER_ID, WORKOUT_DATE, 10)),
                 () -> verify(timeSlotRepository).save(captor.capture()),
                 () -> assertThat(captor.getValue()).usingRecursiveComparison().isEqualTo(timeSlot)
+        );
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    void createAppointmentObtainLockErrorTest() throws Exception {
+        Lock lock = Mockito.mock(Lock.class);
+        when(lock.tryLock()).thenReturn(Boolean.FALSE);
+        when(lockRegistry.obtain(any())).thenReturn(lock);
+        doNothing().when(createAppointmentValidator).validateRequest(any());
+        Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
+        CreateAppointmentDto request = new CreateAppointmentDto(TRAINER_ID, CLIENT_ID, WORKOUT_DATE, 10);
+
+        mockMvc.perform(post("/api/appointment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(content().json("{\"error\":\"Error acquiring lock for PK: TimeSlot.TimeSlotPK(trainerId=1, workoutDate=2024-07-21, workoutHour=10)\"}"))
+                .andExpect(status().isInternalServerError())
+                .andDo(print());
+
+        assertAll(
+                () -> verify(createAppointmentValidator).validateRequest(request),
+                () -> verify(trainerRepository).findById(TRAINER_ID)
         );
     }
 

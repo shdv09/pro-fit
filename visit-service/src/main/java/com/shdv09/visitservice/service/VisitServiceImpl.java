@@ -10,6 +10,7 @@ import com.shdv09.visitservice.repository.VisitRepository;
 import com.shdv09.visitservice.validation.CardValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -26,7 +27,7 @@ public class VisitServiceImpl implements VisitService {
 
     private final CardValidator cardValidator;
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public VisitDto processVisit(ProcessVisitDto dto) {
         ClientDto client = clientServiceProxy.findClientByCardNumber(dto.getCardNumber());
