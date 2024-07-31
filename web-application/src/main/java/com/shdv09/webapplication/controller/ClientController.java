@@ -42,6 +42,14 @@ public class ClientController {
         return clientService.findClients(firstName, lastName, birthDate);
     }
 
+    @GetMapping("/clients/cards/{number}")
+    @Operation(summary = "Метод поиск клиента по номеру клубной карты")
+    public ClientDto findClientByCard(
+            @Parameter(description = "Номер клубной карты")
+            @PathVariable(name = "number") String number) {
+        return clientService.findClientByCardNumber(number);
+    }
+
     @GetMapping("/clients/{id}")
     @Operation(summary = "Метод поиск клиента по идентификатору")
     public ClientDto findClient(

@@ -13,6 +13,8 @@ public interface ClientService {
 
     ClientDto findClient(Long id);
 
+    ClientDto findClientByCardNumber(String cardNumber);
+
     ClientDto addClient(AddClientDto clientDto);
 
     ClientDto updateClient(UpdateClientDto clientDto);

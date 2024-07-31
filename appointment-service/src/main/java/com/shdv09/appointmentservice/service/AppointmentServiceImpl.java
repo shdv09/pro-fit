@@ -26,6 +26,7 @@ import static com.shdv09.appointmentservice.model.TimeSlot.TimeSlotPK;
 @Service
 @Slf4j
 public class AppointmentServiceImpl implements AppointmentService {
+    private static final String LOG_CODE = "APPOINTMENT";
 
     private final TrainerRepository trainerRepository;
 
@@ -39,25 +40,25 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Transactional
     @Override
-    public AppointmentDto createAppointment(CreateAppointmentDto data) {
-        Long threadId = Thread.currentThread().getId();
-        createAppointmentValidator.validateRequest(data);
-        Trainer trainer = trainerRepository.findById(data.getTrainerId()).orElseThrow(
-                        () -> new NotFoundException("Trainer with id = %d not found".formatted(data.getTrainerId())));
-        TimeSlotPK timeSlotPrimaryKey = new TimeSlotPK(data.getTrainerId(), data.getDate(), data.getHour());
+    public AppointmentDto createAppointment(CreateAppointmentDto request) {
+        log.info("{}. Creating appointment. Request: {}", LOG_CODE, request);
+        createAppointmentValidator.validateRequest(request);
+        Trainer trainer = trainerRepository.findById(request.getTrainerId()).orElseThrow(
+                        () -> new NotFoundException("Trainer with id = %d not found".formatted(request.getTrainerId())));
+        TimeSlotPK timeSlotPrimaryKey = new TimeSlotPK(request.getTrainerId(), request.getDate(), request.getHour());
         Lock lock = lockRegistry.obtain(timeSlotPrimaryKey.toString());
         if (lock.tryLock()) {
-            log.info("Obtained lock. Thread: %d, key: %s".formatted(threadId, timeSlotPrimaryKey));
+            log.info("Obtained lock. Key: %s".formatted(timeSlotPrimaryKey));
                 try {
                     if (timeSlotRepository.findById(timeSlotPrimaryKey).isPresent()) {
                         throw new TimeslotBusyException("Timeslot busy, try another time");
                     }
-                    TimeSlot timeslot = new TimeSlot(timeSlotPrimaryKey,trainer,data.getClientId());
+                    TimeSlot timeslot = new TimeSlot(timeSlotPrimaryKey,trainer,request.getClientId());
                     return appointmentMapper.toDto(timeSlotRepository.save(timeslot));
                 } catch (DataIntegrityViolationException e) {
                     throw new TimeslotBusyException("Timeslot busy, try another time");
                 } finally {
-                    log.info("Released lock. Thread: %d, key: %s".formatted(threadId, timeSlotPrimaryKey));
+                    log.info("Released lock. Key: %s".formatted(timeSlotPrimaryKey));
                     lock.unlock();
                 }
             } else {

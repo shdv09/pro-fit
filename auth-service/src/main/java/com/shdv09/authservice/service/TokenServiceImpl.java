@@ -1,6 +1,7 @@
 package com.shdv09.authservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +15,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TokenServiceImpl implements TokenService {
+    private static final String LOG_CODE = "AUTH";
+
     @Value("${jwt.ttl}")
     private Long tokenTtl;
 
@@ -22,6 +26,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(Authentication authentication) {
+        log.info("{}. Generating authentication token for user: {}", LOG_CODE, authentication.getName());
         var now = Instant.now();
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

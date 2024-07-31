@@ -9,13 +9,16 @@ import com.shdv09.visitservice.model.Visit;
 import com.shdv09.visitservice.repository.VisitRepository;
 import com.shdv09.visitservice.validation.CardValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VisitServiceImpl implements VisitService {
+    private static final String LOG_CODE = "VISIT";
 
     private final VisitRepository visitRepository;
 
@@ -29,8 +32,9 @@ public class VisitServiceImpl implements VisitService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
-    public VisitDto processVisit(ProcessVisitDto dto) {
-        ClientDto client = clientServiceProxy.findClientByCardNumber(dto.getCardNumber());
+    public VisitDto processVisit(ProcessVisitDto request) {
+        log.info("{}. Processing visit. Request: {}", LOG_CODE, request);
+        ClientDto client = clientServiceProxy.findClientByCardNumber(request.getCardNumber());
         cardValidator.validateCard(client.getCard());
         Visit visit = visitRepository.findFirstByClientIdOrderByStartTimeDesc(client.getId());
         if (visit == null || visit.getEndTime() != null) {

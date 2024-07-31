@@ -16,6 +16,7 @@ import com.shdv09.clientservice.specification.BirthDateSpecification;
 import com.shdv09.clientservice.specification.FirstNameSpecification;
 import com.shdv09.clientservice.specification.LastNameSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClientServiceImpl implements ClientService {
+    private static final String LOG_CODE = "CLIENT";
 
     private final ClientRepository clientRepository;
 
@@ -39,6 +42,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional(readOnly = true)
     @Override
     public ClientDto findClient(Long id) {
+        log.info("{}. Finding client by id. Id: {}", LOG_CODE, id);
         ClientDto result = clientRepository.findById(id)
                 .map(clientMapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Client with id = %d not found".formatted(id)));
@@ -52,6 +56,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional(readOnly = true)
     @Override
     public ClientDto findClientByCardNumber(String cardNumber) {
+        log.info("{}. Finding client by club card. Card number: {}", LOG_CODE, cardNumber);
         ClubCard card = clubCardRepository.findClubCardByNumber(cardNumber)
                 .orElseThrow(() -> new NotFoundException("Club card with number = %s not found".formatted(cardNumber)));
         ClientDto clientDto = clientMapper.toDto(card.getClient());
@@ -62,6 +67,8 @@ public class ClientServiceImpl implements ClientService {
     @Transactional(readOnly = true)
     @Override
     public List<ClientDto> findClients(String firstName, String lastName, LocalDate birthDate) {
+        log.info("{}. Finding client by criteria. First name: {}, last name: {}, date of birth: {}",
+                LOG_CODE, firstName, lastName, birthDate);
         Specification<Client> specification = Specification.where(new LastNameSpecification(lastName))
                 .and(new FirstNameSpecification(firstName))
                 .and(new BirthDateSpecification(birthDate));
@@ -72,23 +79,26 @@ public class ClientServiceImpl implements ClientService {
 
     @Transactional
     @Override
-    public ClientDto addClient(AddClientDto clientDto) {
-        var client = clientMapper.fromDto(clientDto);
+    public ClientDto addClient(AddClientDto request) {
+        log.info("{}. Adding client. Request: {}", LOG_CODE, request);
+        var client = clientMapper.fromDto(request);
         return clientMapper.toDto(clientRepository.save(client));
     }
 
     @Transactional
     @Override
-    public ClientDto updateClient(UpdateClientDto clientDto) {
-        clientRepository.findById(clientDto.getId())
-                .orElseThrow(() -> new NotFoundException("Client with id=%d not found".formatted(clientDto.getId())));
-        var client = clientMapper.fromDto(clientDto);
+    public ClientDto updateClient(UpdateClientDto request) {
+        log.info("{}. Updating client. Request: {}", LOG_CODE, request);
+        clientRepository.findById(request.getId())
+                .orElseThrow(() -> new NotFoundException("Client with id=%d not found".formatted(request.getId())));
+        var client = clientMapper.fromDto(request);
         return clientMapper.toDto(clientRepository.save(client));
     }
 
     @Transactional
     @Override
     public ClientDto bindCard(BindCardRequest request) {
+        log.info("{}. Binding club card with client. Request: {}", LOG_CODE, request);
         var client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new NotFoundException("Client with id=%d not found"
                         .formatted(request.getClientId())));

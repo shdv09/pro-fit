@@ -8,6 +8,7 @@ import com.shdv09.appointmentservice.exception.NotFoundException;
 import com.shdv09.appointmentservice.repository.TimeSlotRepository;
 import com.shdv09.appointmentservice.repository.TrainerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TrainerServiceImpl implements TrainerService {
+    private static final String LOG_CODE = "TRAINER";
 
     private final TrainerRepository trainerRepository;
 
@@ -30,6 +33,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional(readOnly = true)
     @Override
     public List<TrainerDto> findAll() {
+        log.info("{}. Getting trainers list", LOG_CODE);
         return trainerRepository.findAll().stream()
                 .map(trainerMapper::toDto)
                 .collect(Collectors.toList());
@@ -38,6 +42,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional(readOnly = true)
     @Override
     public TrainerDto findTrainer(Long id) {
+        log.info("{}. Finding trainer by id", LOG_CODE);
         return trainerRepository.findById(id)
                 .map(trainerMapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Trainer with id=%d not found".formatted(id)));
@@ -46,6 +51,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional(readOnly = true)
     @Override
     public List<TimeslotDto> getBusyTimeslots(Long trainerId, LocalDate appointmentDate) {
+        log.info("{}. Getting busy timeslots for trainer", LOG_CODE);
         if (!trainerRepository.existsById(trainerId)) {
             throw new NotFoundException("Trainer with id=%d not found".formatted(trainerId));
         }

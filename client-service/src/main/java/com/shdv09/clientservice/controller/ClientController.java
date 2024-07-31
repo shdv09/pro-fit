@@ -51,7 +51,10 @@ public class ClientController {
     }
 
     @GetMapping("/clients/cards/{number}")
-    public ClientDto findClientByCard(@PathVariable(name = "number") String number) {
+    @Operation(summary = "Метод поиск клиента по номеру клубной карты")
+    public ClientDto findClientByCard(
+            @Parameter(description = "Номер клубной карты")
+            @PathVariable(name = "number") String number) {
         return clientService.findClientByCardNumber(number);
     }
 
