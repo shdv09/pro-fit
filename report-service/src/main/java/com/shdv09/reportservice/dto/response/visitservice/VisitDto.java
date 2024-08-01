@@ -1,4 +1,4 @@
-package com.shdv09.webapplication.dto.response;
+package com.shdv09.reportservice.dto.response.visitservice;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

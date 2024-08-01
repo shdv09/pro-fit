@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +41,7 @@ class AuthControllerTest {
     void loginPositiveTest() throws Exception {
         when(authServiceProxy.generateJwtToken(any(String.class))).thenReturn(JWT_TOKEN);
 
-        MvcResult result = mockMvc.perform(get("/api/login")
+        MvcResult result = mockMvc.perform(post("/api/login")
                         .header("Authorization", BASIC_TOKEN))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -58,7 +58,7 @@ class AuthControllerTest {
     void loginErrorTest() throws Exception {
         when(authServiceProxy.generateJwtToken(any(String.class))).thenThrow(new RuntimeException());
 
-        mockMvc.perform(get("/api/login")
+        mockMvc.perform(post("/api/login")
                         .header("Authorization", BASIC_TOKEN))
                 .andExpect(status().isInternalServerError())
                 .andDo(print());

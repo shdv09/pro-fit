@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -42,7 +46,18 @@ public class VisitServiceImpl implements VisitService {
         } else {
             visit.setEndTime(dateFactory.generateDate());
         }
-        return visitMapper.toDto(visitRepository.save(visit), client);
+        return visitMapper.toDto(visitRepository.save(visit));
+    }
+
+    @Override
+    public List<VisitDto> getVisitsForPeriod(Long clientId, LocalDate startDate, LocalDate endDate) {
+        LocalDate endDateModified = endDate.plusDays(1L);
+        log.info("{}. Retrieving visits for a period. client: {}, start: {}, end: {}",
+                LOG_CODE, clientId, startDate, endDateModified);
+        return visitRepository.findByEndTimeBetweenAndClientId(
+                startDate.atStartOfDay(), endDateModified.atStartOfDay(), clientId).stream()
+                .map(visitMapper::toDto)
+                .collect(Collectors.toList());
     }
 }
 

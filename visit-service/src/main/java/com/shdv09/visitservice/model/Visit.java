@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "visits")
@@ -23,9 +23,9 @@ public class Visit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Date startTime;
+    private LocalDateTime startTime;
 
-    private Date endTime;
+    private LocalDateTime endTime;
 
     private Long clientId;
 }

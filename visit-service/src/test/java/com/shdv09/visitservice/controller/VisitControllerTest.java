@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,7 +93,7 @@ class VisitControllerTest {
     @WithMockUser(username = "user")
     void processNewVisitTest() throws Exception {
         doNothing().when(cardValidator).validateCard(any(ClubCardDto.class));
-        when(dateFactory.generateDate()).thenReturn(new Date(1721649600000L));
+        when(dateFactory.generateDate()).thenReturn(LocalDateTime.of(2024, 7, 22, 12, 0 ,0));
         ClientDto client = mapper.readValue(getFileContent(CLIENT_DTO_JSON_PATH), ClientDto.class);
         when(clientServiceProxy.findClientByCardNumber(anyString())).thenReturn(client);
         when(visitRepository.findFirstByClientIdOrderByStartTimeDesc(anyLong())).thenReturn(null);
@@ -128,7 +128,7 @@ class VisitControllerTest {
     @WithMockUser(username = "user")
     void processExistedVisitTest() throws Exception {
         doNothing().when(cardValidator).validateCard(any(ClubCardDto.class));
-        when(dateFactory.generateDate()).thenReturn(new Date(1721721600000L));
+        when(dateFactory.generateDate()).thenReturn(LocalDateTime.of(2024, 7, 23, 8, 0 ,0));
         ClientDto client = mapper.readValue(getFileContent(CLIENT_DTO_JSON_PATH), ClientDto.class);
         when(clientServiceProxy.findClientByCardNumber(anyString())).thenReturn(client);
         Visit savedVisit = mapper.readValue(getFileContent(SAVED_VISIT_JSON_PATH), Visit.class);
@@ -163,7 +163,7 @@ class VisitControllerTest {
     @WithMockUser(username = "user")
     void processVisitCardNotFoundTest() throws Exception {
         doNothing().when(cardValidator).validateCard(any(ClubCardDto.class));
-        when(dateFactory.generateDate()).thenReturn(new Date(1721649600000L));
+        when(dateFactory.generateDate()).thenReturn(LocalDateTime.of(2024, 7, 22, 12, 0 ,0));
         FeignException ex = mock(FeignException.class);
         when(ex.status()).thenReturn(404);
         when(ex.getMessage()).thenReturn("Card not found");

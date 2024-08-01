@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.integration.support.locks.LockRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.locks.Lock;
@@ -38,7 +39,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final LockRegistry lockRegistry;
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public AppointmentDto createAppointment(CreateAppointmentDto request) {
         log.info("{}. Creating appointment. Request: {}", LOG_CODE, request);
