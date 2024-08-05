@@ -1,0 +1,8 @@
+server:
+  port: 8006
+spring:
+  application:
+    name: report-service
+jwt:
+  private-key: classpath:private.key
+  public-key: classpath:public.key

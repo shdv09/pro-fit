@@ -1,0 +1,18 @@
+[
+  {
+    "pkey": {
+      "trainerId": 1,
+      "workoutDate": "2024-07-21",
+      "workoutHour": 8
+    },
+    "trainer": {
+      "id": 1,
+      "firstName": "Chuck",
+      "lastName": "Norris",
+      "gender": "M",
+      "birthDate": "1940-03-10",
+      "specialization": "COMBAT"
+    },
+    "clientId": 2
+  }
+]
