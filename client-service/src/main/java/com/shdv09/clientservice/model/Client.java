@@ -1,5 +1,6 @@
 package com.shdv09.clientservice.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,7 @@ public class Client {
 
     private String lastName;
 
+    @Column(length = 1)
     private String gender;
 
     private LocalDate birthDate;

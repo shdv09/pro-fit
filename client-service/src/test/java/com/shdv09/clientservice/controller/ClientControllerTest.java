@@ -391,6 +391,7 @@ class ClientControllerTest {
         assertAll(
                 () -> assertEquals(reference, response),
                 () -> verify(clientRepository).findById(request.getClientId()),
+                () -> verify(clubCardRepository).findClubCardByClientId(request.getClientId()),
                 () -> verify(clubCardRepository).findById(request.getCardId()),
                 () -> verify(clubCardRepository).save(clubCard)
 
@@ -417,6 +418,7 @@ class ClientControllerTest {
         clubCard.setClient(client);
         assertAll(
                 () -> verify(clientRepository).findById(request.getClientId()),
+                () -> verify(clubCardRepository).findClubCardByClientId(request.getClientId()),
                 () -> verify(clubCardRepository).findById(request.getCardId()),
                 () -> verify(clubCardRepository).save(clubCard)
 

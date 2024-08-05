@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,7 +60,10 @@ public class ClientServiceImpl implements ClientService {
         log.info("{}. Finding client by club card. Card number: {}", LOG_CODE, cardNumber);
         ClubCard card = clubCardRepository.findClubCardByNumber(cardNumber)
                 .orElseThrow(() -> new NotFoundException("Club card with number = %s not found".formatted(cardNumber)));
-        ClientDto clientDto = clientMapper.toDto(card.getClient());
+        Client client = Optional.ofNullable(card.getClient())
+                .orElseThrow(() -> new NotFoundException(
+                        "Client with club card number = %s not found".formatted(cardNumber)));
+        ClientDto clientDto = clientMapper.toDto(client);
         clientDto.setCard(clubCardMapper.toDto(card));
         return clientDto;
     }
@@ -102,6 +106,12 @@ public class ClientServiceImpl implements ClientService {
         var client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new NotFoundException("Client with id=%d not found"
                         .formatted(request.getClientId())));
+        var existedClubCard = clubCardRepository.findClubCardByClientId(request.getClientId())
+                .orElse(null);
+        if (existedClubCard != null) {
+            existedClubCard.setClient(null);
+            clubCardRepository.save(existedClubCard);
+        }
         var clubCard = clubCardRepository.findById(request.getCardId())
                 .orElseThrow(() -> new NotFoundException("Card with id=%d not found".formatted(request.getCardId())));
         clubCard.setClient(client);
