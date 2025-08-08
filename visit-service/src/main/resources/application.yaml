@@ -23,3 +23,6 @@ spring:
 jwt:
   private-key: classpath:private.key
   public-key: classpath:public.key
+
+services:
+  client-service: client-service:8001

@@ -10,7 +10,6 @@ import com.shdv09.appointmentservice.model.TimeSlot;
 import com.shdv09.appointmentservice.model.Trainer;
 import com.shdv09.appointmentservice.repository.TimeSlotRepository;
 import com.shdv09.appointmentservice.repository.TrainerRepository;
-import com.shdv09.appointmentservice.validation.CreateAppointmentValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,15 +34,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentMapper appointmentMapper;
 
-    private final CreateAppointmentValidator createAppointmentValidator;
-
     private final LockRegistry lockRegistry;
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public AppointmentDto createAppointment(CreateAppointmentDto request) {
         log.info("{}. Creating appointment. Request: {}", LOG_CODE, request);
-        createAppointmentValidator.validateRequest(request);
         Trainer trainer = trainerRepository.findById(request.getTrainerId()).orElseThrow(
                         () -> new NotFoundException("Trainer with id = %d not found".formatted(request.getTrainerId())));
         TimeSlotPK timeSlotPrimaryKey = new TimeSlotPK(request.getTrainerId(), request.getDate(), request.getHour());

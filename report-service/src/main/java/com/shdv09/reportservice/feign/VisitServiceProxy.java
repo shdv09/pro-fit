@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.util.List;
 
-@FeignClient(name = "visit-service", url = "visit-service:8002")
+@FeignClient(name = "visit-service", url = "${services.visit-service}")
 public interface VisitServiceProxy {
 
     @GetMapping("/api/visits")

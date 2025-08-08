@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "visit-service", url = "visit-service:8002")
+@FeignClient(name = "visit-service", url = "${services.visit-service}")
 public interface VisitServiceProxy {
 
     @PostMapping("/api/visits")

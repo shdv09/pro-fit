@@ -1,5 +1,7 @@
 package com.shdv09.appointmentservice.dto.request;
 
+import com.shdv09.appointmentservice.validation.ValidAppointmentDate;
+import com.shdv09.appointmentservice.validation.ValidAppointmentHour;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,11 +23,11 @@ public class CreateAppointmentDto {
     @Schema(description = "Идентификатор клиента", example = "1")
     private Long clientId;
 
-    @NotNull
+    @ValidAppointmentDate(message = "Invalid date, you can't create appointment in the past")
     @Schema(description = "Дата тренировки", type = "string", format = "date", example = "2024-08-27")
     private LocalDate date;
 
-    @NotNull
+    @ValidAppointmentHour(message = "Invalid appointment hour, should be within opening hours")
     @Schema(description = "Час начала тренировки", example = "12")
     private Integer hour;
 }

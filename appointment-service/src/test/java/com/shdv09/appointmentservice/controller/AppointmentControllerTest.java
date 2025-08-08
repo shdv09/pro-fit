@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shdv09.appointmentservice.dto.request.CreateAppointmentDto;
 import com.shdv09.appointmentservice.dto.response.AppointmentDto;
-import com.shdv09.appointmentservice.exception.RequestValidationException;
 import com.shdv09.appointmentservice.model.TimeSlot;
 import com.shdv09.appointmentservice.model.Trainer;
 import com.shdv09.appointmentservice.repository.TimeSlotRepository;
 import com.shdv09.appointmentservice.repository.TrainerRepository;
-import com.shdv09.appointmentservice.validation.CreateAppointmentValidator;
+import com.shdv09.appointmentservice.service.DateFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
-import org.springframework.integration.jdbc.lock.JdbcLockRegistry;
 import org.springframework.integration.support.locks.LockRegistry;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,8 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -73,7 +69,7 @@ class AppointmentControllerTest {
     private TrainerRepository trainerRepository;
 
     @MockBean
-    private CreateAppointmentValidator createAppointmentValidator;
+    private DateFactory dateFactory;
 
     @MockBean
     private LockRegistry lockRegistry;
@@ -81,11 +77,12 @@ class AppointmentControllerTest {
     @BeforeEach
     void init() {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        when(dateFactory.generateDate()).thenReturn(WORKOUT_DATE.minusDays(1));
     }
 
     @AfterEach
     void after() {
-        verifyNoMoreInteractions(timeSlotRepository, trainerRepository, createAppointmentValidator);
+        verifyNoMoreInteractions(timeSlotRepository, trainerRepository);
     }
 
     @Test
@@ -94,7 +91,6 @@ class AppointmentControllerTest {
         Lock lock = Mockito.mock(Lock.class);
         when(lock.tryLock()).thenReturn(Boolean.TRUE);
         when(lockRegistry.obtain(any())).thenReturn(lock);
-        doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
         when(timeSlotRepository.findById(any())).thenReturn(Optional.empty());
@@ -114,7 +110,6 @@ class AppointmentControllerTest {
 
         ArgumentCaptor<TimeSlot> captor = ArgumentCaptor.forClass(TimeSlot.class);
         assertAll(
-                () -> verify(createAppointmentValidator).validateRequest(request),
                 () -> assertEquals(reference, response),
                 () -> verify(trainerRepository).findById(TRAINER_ID),
                 () -> verify(timeSlotRepository).findById(new TimeSlot.TimeSlotPK(TRAINER_ID, WORKOUT_DATE, 10)),
@@ -126,7 +121,6 @@ class AppointmentControllerTest {
     @Test
     @WithMockUser(username = "user")
     void createAppointmentTrainerMissingTest() throws Exception {
-        doNothing().when(createAppointmentValidator).validateRequest(any());
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.empty());
         CreateAppointmentDto request = new CreateAppointmentDto(TRAINER_ID, CLIENT_ID, LocalDate.of(2024, 7, 21), 10);
 
@@ -138,7 +132,6 @@ class AppointmentControllerTest {
                 .andDo(print());
 
         assertAll(
-                () -> verify(createAppointmentValidator).validateRequest(request),
                 () -> verify(trainerRepository).findById(TRAINER_ID)
         );
     }
@@ -149,7 +142,6 @@ class AppointmentControllerTest {
         Lock lock = Mockito.mock(Lock.class);
         when(lock.tryLock()).thenReturn(Boolean.TRUE);
         when(lockRegistry.obtain(any())).thenReturn(lock);
-        doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
         TimeSlot timeSlot = mapper.readValue(getFileContent(TIMESLOT_JSON_PATH), TimeSlot.class);
@@ -165,7 +157,6 @@ class AppointmentControllerTest {
                 .andReturn();
 
         assertAll(
-                () -> verify(createAppointmentValidator).validateRequest(request),
                 () -> verify(trainerRepository).findById(TRAINER_ID),
                 () -> verify(timeSlotRepository).findById(new TimeSlot.TimeSlotPK(TRAINER_ID, WORKOUT_DATE, 10))
         );
@@ -177,7 +168,6 @@ class AppointmentControllerTest {
         Lock lock = Mockito.mock(Lock.class);
         when(lock.tryLock()).thenReturn(Boolean.TRUE);
         when(lockRegistry.obtain(any())).thenReturn(lock);
-        doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
         when(timeSlotRepository.findById(any())).thenReturn(Optional.empty());
@@ -194,7 +184,6 @@ class AppointmentControllerTest {
 
         ArgumentCaptor<TimeSlot> captor = ArgumentCaptor.forClass(TimeSlot.class);
         assertAll(
-                () -> verify(createAppointmentValidator).validateRequest(request),
                 () -> verify(trainerRepository).findById(TRAINER_ID),
                 () -> verify(timeSlotRepository).findById(new TimeSlot.TimeSlotPK(TRAINER_ID, WORKOUT_DATE, 10)),
                 () -> verify(timeSlotRepository).save(captor.capture()),
@@ -208,7 +197,6 @@ class AppointmentControllerTest {
         Lock lock = Mockito.mock(Lock.class);
         when(lock.tryLock()).thenReturn(Boolean.FALSE);
         when(lockRegistry.obtain(any())).thenReturn(lock);
-        doNothing().when(createAppointmentValidator).validateRequest(any());
         Trainer trainer = mapper.readValue(getFileContent(TRAINER_JSON_PATH), Trainer.class);
         when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
         CreateAppointmentDto request = new CreateAppointmentDto(TRAINER_ID, CLIENT_ID, WORKOUT_DATE, 10);
@@ -221,7 +209,6 @@ class AppointmentControllerTest {
                 .andDo(print());
 
         assertAll(
-                () -> verify(createAppointmentValidator).validateRequest(request),
                 () -> verify(trainerRepository).findById(TRAINER_ID)
         );
     }
@@ -237,26 +224,6 @@ class AppointmentControllerTest {
                 .andExpect(content().json("{\"error\":\"Validation failed for: clientId, date, hour, trainerId\"}"))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
-    }
-
-    @Test
-    @WithMockUser(username = "user")
-    void createAppointmentValidatorTest() throws Exception {
-        doThrow(new RequestValidationException("Invalid date, you can't create appointment in the past"))
-                .when(createAppointmentValidator).validateRequest(any());
-        CreateAppointmentDto request = new CreateAppointmentDto(TRAINER_ID, CLIENT_ID, WORKOUT_DATE, 10);
-
-
-        mockMvc.perform(post("/api/appointment")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request)))
-                .andExpect(content().json("{\"error\":\"Invalid date, you can't create appointment in the past\"}"))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-
-        assertAll(
-                () -> verify(createAppointmentValidator).validateRequest(request)
-        );
     }
 
     @Test

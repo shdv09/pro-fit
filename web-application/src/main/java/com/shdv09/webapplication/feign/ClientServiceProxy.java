@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.util.List;
 
-@FeignClient(name = "client-service", url = "client-service:8001")
+@FeignClient(name = "client-service", url = "${services.client-service}")
 public interface ClientServiceProxy {
 
     @GetMapping("/api/clients/{id}")
