@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.util.List;
 
-@FeignClient(name = "appointment-service", url = "localhost:8003")
+@FeignClient(name = "appointment-service", url = "appointment-service:8003")
 public interface AppointmentServiceProxy {
 
     @GetMapping("/api/trainers")
