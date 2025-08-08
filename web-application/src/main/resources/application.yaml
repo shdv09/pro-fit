@@ -1,0 +1,14 @@
+server:
+  port: 8000
+spring:
+  application:
+    name: web-application
+jwt:
+  private-key: classpath:private.key
+  public-key: classpath:public.key
+
+services:
+  client-service: client-service:8001
+  visit-service: visit-service:8002
+  appointment-service: appointment-service:8003
+  auth-service: auth-service:8004
